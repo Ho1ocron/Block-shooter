@@ -39,6 +39,13 @@ class User:
         if self.cursor.execute("SEL * FROM backgrounds").fetchall() is None:
             self.cursor.execute("INSERT INTO backgrounds('Background', 'Clutch', 'Price', 'Structure') VALUES(?, ?, ?,"
                                 "?)", ('Ice 1', 1.0, 0, 'Background1'))
+        self.cursor.execute("""CREATE TABLE IF NOT EXISTS session(
+                            GameMode STR,
+                            Car STR,
+                            Level STR,
+                            Background STR);""")
+        self.cursor.execute("""CREATE TABLE IF NOT EXISTS maps(
+                            map STR);""")
 
     def get_car(self, name):
         with self.connection:
@@ -55,3 +62,18 @@ class User:
     def get_all_background(self):
         with self.connection:
             return self.cursor.execute("SELECT * FROM backgrounds").fetchall()
+
+    def create_session(self, gm, car, level, bg):
+        with self.connection:
+            return self.cursor.execute("INSERT INTO session('GameMode', 'Car', 'Level', 'Background') VALUES(?, ?, ?,"
+                                       "?)", (gm, car, level, bg))
+
+    def get_session(self):
+        with self.connection:
+            return self.cursor.execute("SEL * FROM session").fetchall()
+
+    def create_map(self, name):
+        self.cursor.execute(F"""CREATE TABLE IF NOT EXISTS {name}map(
+                            id INT, type INT, width BIGINT, height BIGINT);""")
+        with self.connection:
+            return self.cursor.execute("INSERT INTO maps(map) VALUES(?)", name)
