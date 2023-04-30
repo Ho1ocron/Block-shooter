@@ -226,7 +226,7 @@ class App(QWidget):
         self.bg_sh.setFont(QFont('Arial', 35))
         self.bg_sh.setStyleSheet("background-color: rgba(255, 255, 255, 75);\n""border: rgba(255, 255, 255, 100);") 
         self.bg_sh.resize(300, 55) 
-        self.bg_sh.move(250, 175)
+        self.bg_sh.move(250, 150)
         self.bg_sh.clicked.connect(self.bg_buy) 
         self.bg_sh.hide() 
 
@@ -235,7 +235,7 @@ class App(QWidget):
         self.car_sh.setFont(QFont('Arial', 35))
         self.car_sh.setStyleSheet("background-color: rgba(255, 255, 255, 75);\n""border: rgba(255, 255, 255, 100);") 
         self.car_sh.resize(300, 55) 
-        self.car_sh.move(250, 240)
+        self.car_sh.move(250, 215)
         self.car_sh.clicked.connect(self.car_buy) 
         self.car_sh.hide()
         
@@ -244,7 +244,7 @@ class App(QWidget):
         self.map_sh.setFont(QFont('Arial', 35))
         self.map_sh.setStyleSheet("background-color: rgba(255, 255, 255, 75);\n""border: rgba(255, 255, 255, 100);") 
         self.map_sh.resize(300, 55) 
-        self.map_sh.move(250, 305)
+        self.map_sh.move(250, 280)
         self.map_sh.clicked.connect(self.map_buy) 
         self.map_sh.hide()
 
@@ -253,11 +253,20 @@ class App(QWidget):
         self.shop_exit.setFont(QFont('Arial', 35))
         self.shop_exit.setStyleSheet("background-color: rgba(255, 255, 255, 75);\n""border: rgba(255, 255, 255, 100);") 
         self.shop_exit.resize(300, 55) 
-        self.shop_exit.move(250, 370)
+        self.shop_exit.move(250, 345)
         self.shop_exit.clicked.connect(self.shop_exit_func) 
         self.shop_exit.hide()
+
+        #: map creator
+        self.map_cr = QPushButton('Map creator', self)
+        self.map_cr.setFont(QFont('Arial', 35))
+        self.map_cr.setStyleSheet("background-color: rgba(255, 255, 255, 75);\n""border: rgba(255, 255, 255, 100);") 
+        self.map_cr.resize(300, 55) 
+        self.map_cr.move(250, 410)
+        self.map_cr.clicked.connect(self.create_map) 
+        self.map_cr.hide()
         
-        self.shop_list = [self.car_sh, self.map_sh, self.bg_sh, self.shop_exit]
+        self.shop_list = [self.car_sh, self.map_sh, self.bg_sh, self.map_cr,  self.shop_exit]
 
         """Background shop"""
 
@@ -428,6 +437,9 @@ class App(QWidget):
         
         for j in self.map_list:
             j.show()
+
+    def create_map(self):
+        pass
 
 
     def settings(self):
