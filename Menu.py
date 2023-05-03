@@ -561,7 +561,9 @@ class App(QWidget):
     def car_exit_shop(self):
         for i in self.car_shop_cmd_list:
             i.hide()
-        self.car1img.hide()
+
+        for n in self.car_list:
+            n.hide()
         
         for j in self.shop_list:
             j.show()
