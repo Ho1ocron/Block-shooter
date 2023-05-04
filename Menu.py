@@ -1,6 +1,5 @@
 import os
 import sys
-from PIL import Image
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QLabel
 from PyQt5.QtGui import QPalette, QBrush, QPixmap
 from PyQt5.QtGui import QPalette
@@ -8,12 +7,6 @@ from PyQt5.QtGui import QFont
 from PyQt5.QtCore import pyqtSlot
 import threading
 
-
-def image_resize():
-    image = Image.open('bg1.png')
-    new_image = image.resize((190, 108))
-    new_image.save('bg1.png')
-    return new_image
 
 class App(QWidget):
 
@@ -25,7 +18,6 @@ class App(QWidget):
         self.width = 800
         self.height = 600
         self.initUI()
-        image_resize()
 
     def initUI(self):
         
@@ -260,7 +252,7 @@ class App(QWidget):
         self.shop_exit.setFont(QFont('Arial', 35))
         self.shop_exit.setStyleSheet("background-color: rgba(255, 255, 255, 75);\n""border: rgba(255, 255, 255, 100);") 
         self.shop_exit.resize(300, 55) 
-        self.shop_exit.move(250, 345)
+        self.shop_exit.move(250, 410)
         self.shop_exit.clicked.connect(self.shop_exit_func) 
         self.shop_exit.hide()
 
@@ -269,7 +261,7 @@ class App(QWidget):
         self.map_cr.setFont(QFont('Arial', 35))
         self.map_cr.setStyleSheet("background-color: rgba(255, 255, 255, 75);\n""border: rgba(255, 255, 255, 100);") 
         self.map_cr.resize(300, 55) 
-        self.map_cr.move(250, 410)
+        self.map_cr.move(250, 345)
         self.map_cr.clicked.connect(self.create_map) 
         self.map_cr.hide()
         
@@ -278,18 +270,36 @@ class App(QWidget):
         """Background shop"""
 
         #: BG choose
+        
+        self.bg1img = QLabel(self)
+        self.bgimgpix = QPixmap("bg1_changed.png")
+        self.bg1img.setPixmap(self.bgimgpix)
+        self.bg1img.move(305, 246)
+        self.bg1img.hide()
+
+        self.bg2img = QLabel(self)
+        self.bg2imgpix = QPixmap("bg_time.png")
+        self.bg2img.setPixmap(self.bg2imgpix)
+        self.bg2img.move(305, 246)
+        self.bg2img.hide()
+
+        self.bg_list = [self.bg1img, self.bg2img]
+        self.bg_n = 0
+
         self.BGNEXT = QPushButton('>>', self)
         self.BGNEXT.setFont(QFont('Arial', 32))
         self.BGNEXT.setStyleSheet("background-color: rgba(255, 255, 255, 75);\n""border: rgba(255, 255, 255, 100);") 
         self.BGNEXT.resize(100, 44) 
         self.BGNEXT.move(700, 278)
+        self.BGNEXT.clicked.connect(self.bg_next_fn)
         self.BGNEXT.hide()
 
-        self.BGPREV = self.NEXT = QPushButton('<<', self)
+        self.BGPREV = QPushButton('<<', self)
         self.BGPREV.setFont(QFont('Arial', 32))
         self.BGPREV.setStyleSheet("background-color: rgba(255, 255, 255, 75);\n""border: rgba(255, 255, 255, 100);") 
         self.BGPREV.resize(100, 44) 
         self.BGPREV.move(0, 278)
+        self.BGPREV.clicked.connect(self.bg_prev_fn)
         self.BGPREV.hide()
 
         self.bg_ch_btn = QPushButton('Simple BG', self)
@@ -308,7 +318,22 @@ class App(QWidget):
         self.bg_exit.clicked.connect(self.bg_exit_shop) 
         self.bg_exit.hide()
 
-        self.bg_shop_cmd_list = [self.BGNEXT, self.BGPREV, self.bg_exit, self.bg_ch_btn]
+        self.bg1_ch_btn = QPushButton('Simple BG', self)
+        self.bg1_ch_btn.setFont(QFont('Arial', 35))
+        self.bg1_ch_btn.setStyleSheet("background-color: rgba(255, 255, 255, 75);\n""border: rgba(255, 255, 255, 100);") 
+        self.bg1_ch_btn.resize(400, 55) 
+        self.bg1_ch_btn.move(200, 370)
+        self.bg1_ch_btn.hide()
+
+        self.bg2_ch_btn = QPushButton('Dark BG', self)
+        self.bg2_ch_btn.setFont(QFont('Arial', 35))
+        self.bg2_ch_btn.setStyleSheet("background-color: rgba(255, 255, 255, 75);\n""border: rgba(255, 255, 255, 100);") 
+        self.bg2_ch_btn.resize(400, 55) 
+        self.bg2_ch_btn.move(200, 370)
+        self.bg2_ch_btn.hide()
+
+        self.bg_shop_cmd_list = [self.BGNEXT, self.BGPREV, self.bg_exit]
+        self.bg_shop_cmd_list1 = [self.bg1_ch_btn, self.bg2_ch_btn]
 
 
         """Car shop"""
@@ -321,7 +346,7 @@ class App(QWidget):
         self.car1img.hide()
 
         self.car2img = QLabel(self)
-        self.car2imgpix = QPixmap("bg1.png")
+        self.car2imgpix = QPixmap("bg_time.png")
         self.car2img.setPixmap(self.car2imgpix)
         self.car2img.move(305, 246)
         self.car2img.hide()
@@ -353,6 +378,13 @@ class App(QWidget):
         self.car_ch_btn.move(200, 370)
         self.car_ch_btn.hide()
 
+        self.car1_ch_btn = QPushButton('Dark car', self)
+        self.car1_ch_btn.setFont(QFont('Arial', 35))
+        self.car1_ch_btn.setStyleSheet("background-color: rgba(255, 255, 255, 75);\n""border: rgba(255, 255, 255, 100);") 
+        self.car1_ch_btn.resize(400, 55) 
+        self.car1_ch_btn.move(200, 370)
+        self.car1_ch_btn.hide()
+
         #: exit from car shop
         self.car_exit = QPushButton('Back', self)
         self.car_exit.setFont(QFont('Arial', 35))
@@ -362,7 +394,8 @@ class App(QWidget):
         self.car_exit.clicked.connect(self.car_exit_shop) 
         self.car_exit.hide()
 
-        self.car_shop_cmd_list = [self.CARNEXT, self.CARPREV, self.car_exit, self.car_ch_btn]
+        self.car_shop_cmd_list = [self.CARNEXT, self.CARPREV, self.car_exit]
+        self.car_shop_cmd_list1 = [self.car_ch_btn, self.car1_ch_btn]
 
         #self.car_list = [self.car0, self.car1, self.car2, self.car_exit]
 
@@ -436,6 +469,43 @@ class App(QWidget):
 
         for j in self.bg_shop_cmd_list:
             j.show()
+        self.bg_shop_cmd_list1[0].show()
+        self.bg1img.show()
+    
+    def bg_next_fn(self):
+        self.bg_list[self.bg_n].show()
+        if self.bg_n != len(self.bg_list)-1:
+            self.bg_n += 1
+            self.bg_list[self.bg_n].show()
+            self.bg_list[self.bg_n-1].hide()
+            self.bg_shop_cmd_list1[self.bg_n].show()
+            self.bg_shop_cmd_list1[self.bg_n-1].hide()
+        else:
+            self.bg_n = 0
+            self.bg_list[self.bg_n].show()
+            self.bg_list[self.bg_n-1].hide()
+            self.bg_shop_cmd_list1[self.bg_n].show()
+            self.bg_shop_cmd_list1[self.bg_n-1].hide()
+
+    def bg_prev_fn(self):
+        self.bg_list[self.bg_n].show()
+        #print(self.bg_n)
+        #print(len(self.bg_list), "\n", self.bg_list[self.bg_n+1])
+        if self.bg_n != 0:
+            self.bg_n -= 1
+            #print(self.bg_n)
+            self.bg_list[self.bg_n].show()
+            self.bg_list[self.bg_n+1].hide()
+            self.bg_shop_cmd_list1[self.bg_n].show()
+            self.bg_shop_cmd_list1[self.bg_n+1].hide()
+        else:
+            self.bg_n = len(self.bg_list)-1
+            #print(self.bg_n)
+            self.bg_list[self.bg_n].show()
+            self.bg_list[self.bg_n - 1].hide()
+            self.bg_shop_cmd_list1[self.bg_n].show()
+            self.bg_shop_cmd_list1[self.bg_n - 1].hide()
+    
 
     def car_buy(self):
         for i in self.shop_list:
@@ -443,7 +513,9 @@ class App(QWidget):
 
         for j in self.car_shop_cmd_list:
             j.show()
+        self.car_shop_cmd_list1[0].show()
         self.car1img.show()
+        
     
     def car_next_fn(self):
         self.car_list[self.car_n].show()
@@ -451,10 +523,14 @@ class App(QWidget):
             self.car_n += 1
             self.car_list[self.car_n].show()
             self.car_list[self.car_n-1].hide()
+            self.car_shop_cmd_list1[self.car_n].show()
+            self.car_shop_cmd_list1[self.car_n-1].hide()
         else:
             self.car_n = 0
             self.car_list[self.car_n].show()
-            self.car_list[self.car_n-1].hide()
+            self.car_list[self.car_n+1].hide()
+            self.car_shop_cmd_list1[self.car_n].show()
+            self.car_shop_cmd_list1[self.car_n+1].hide()
     
     def car_prev_fn(self):
         self.car_list[self.car_n].show()
@@ -462,10 +538,14 @@ class App(QWidget):
             self.car_n -= 1
             self.car_list[self.car_n].show()
             self.car_list[self.car_n+1].hide()
+            self.car_shop_cmd_list1[self.car_n].show()
+            self.car_shop_cmd_list1[self.car_n+1].hide()
         else:
-            self.car_n = 1
+            self.car_n = 0
             self.car_list[self.car_n].show()
             self.car_list[self.car_n+1].hide()
+            self.car_shop_cmd_list1[self.car_n].show()
+            self.car_shop_cmd_list1[self.car_n+1].hide()
 
 
     def map_buy(self):
@@ -554,6 +634,12 @@ class App(QWidget):
         for i in self.bg_shop_cmd_list:
             i.hide()
         
+        for n in self.bg_list:
+            n.hide()
+
+        for l in self.bg_shop_cmd_list1:
+            l.hide()
+
         for j in self.shop_list:
             j.show()
     
@@ -568,6 +654,8 @@ class App(QWidget):
         for j in self.shop_list:
             j.show()
         
+        for l in self.car_shop_cmd_list1:
+            l.hide()
     
     def map_exit_shop(self):
         for i in self.map_shop_cmd_list:
@@ -576,7 +664,13 @@ class App(QWidget):
         for j in self.shop_list:
             j.show()
 
+    #Car choose func
+    '''There will be SQL func'''
+    def simple_car(self):
+        pass
 
+    def dark_car(self):
+        pass
 
     def game(self):
         os.system("python New_game.py 1")
