@@ -29,7 +29,7 @@ class User:
                             Structure STR);""")
         if not self.cursor.execute("SELECT * FROM cars").fetchall():
             self.cursor.execute("INSERT INTO cars('Car', 'Power', 'Clutch', 'Streamlining', 'Max_Speed', 'Price',"
-                                "'Structure') VALUES(?, ?, ?, ?, ?, ?, ?)", ('Lada Kalina', 1.0, 1.0, 1.0, 5.0, 0,
+                                "'Structure') VALUES(?, ?, ?, ?, ?, ?, ?)", ('Lada Kalina', 1.0, 1.0, 1.0, 7.0, 0,
                                                                              'car1.png'))
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS backgrounds(
                             Background STR,
@@ -38,7 +38,7 @@ class User:
                             Structure STR);""")
         if not self.cursor.execute("SELECT * FROM backgrounds").fetchall():
             self.cursor.execute("INSERT INTO backgrounds('Background', 'Clutch', 'Price', 'Structure') VALUES(?, ?, ?,"
-                                "?)", ('Ice 1', 1.0, 0, 'bg1.png'))
+                                "?)", ('Ice 1', 1.2, 0, 'bg1.png'))
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS session(
                             GameMode STR,
                             Car STR,

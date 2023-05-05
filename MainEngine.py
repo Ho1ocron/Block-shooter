@@ -9,9 +9,11 @@ db = UserAndMapData.User()
 session_data = db.get_session()[-1]  # (gm, car, level, bg)
 if session_data[0] == 'creative':
     import CarPowerCreativeMode as CarPower
+    import CreativePer
+    import NoCollideBlocks
+    import PreRenderBlocks
 else:
     import CarPowerPlayMode as CarPower
-    import NoCollideBlocks
 
 
 def load_image(name):  # Load all img
@@ -52,7 +54,7 @@ car_data = db.get_car(session_data[1])[0]  # (car, power, clutch, streamlining, 
 bg_data = db.get_background(session_data[-1])[0]  # (name, clutch, price, str)
 fps_in_game = pygame.font.Font(pygame.font.get_default_font(), 36)
 all_sprites = pygame.sprite.Group()
-now_block = '.'
+now_block = '1'
 main_run = True
 power_width_high = False
 power_width_low = False
@@ -68,6 +70,7 @@ coordinates_changed = [0, 0]
 # Main cycle start
 while main_run:
     clock.tick(60)
+    mouse_pos = pygame.mouse.get_pos()
     # All events will be there
     for event in pygame.event.get():
         if event.type == pygame.QUIT:  # Close program
@@ -86,6 +89,9 @@ while main_run:
                 esc_button = not esc_button
             if event.key == pygame.K_SPACE:
                 car_stop = True
+            if session_data[0] == 'creative':
+                if CreativePer.type_block(event) is not None:
+                    now_block = CreativePer.type_block(event)
 
         elif event.type == pygame.KEYUP:
             if event.key == pygame.K_w:
@@ -117,7 +123,6 @@ while main_run:
     # End all operations with time
 
     # Work with sprites start
-
     # THIS is global state of changing coordinates!
     coordinates_changed = [coordinates_changed[0] - last_power_width, coordinates_changed[1] - last_power_height]
     # RENDER AT THE END!
@@ -126,5 +131,9 @@ while main_run:
     now_car = CarRender.render_car(power_width_high, power_width_low, power_height_high, power_height_low, car0,
                                    (screen_width, screen_height), now_car)
     screen.blit(now_car[0], now_car[1])
+    if session_data[0] == 'creative':
+        PreRenderBlocks.draw(screen, now_block, (mouse_pos[0] - (mouse_pos[0] + last_power_width) % 5,
+                                                 mouse_pos[1] - (mouse_pos[1] + last_power_height) % 5))
     screen.blit(fps_in_game.render(f'FPS: {str(clock.get_fps())[:4]}', True, 'white'), dest=(10, 10))
     pygame.display.flip()
+0

@@ -58,7 +58,7 @@ class MobileWall1(pygame.sprite.Sprite):
     def __init__(self, xy):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((100, 30))
-        self.image.fill('red')
+        self.image.fill('gray')
         self.rect = self.image.get_rect()
         self.rect.center = (xy[0], xy[1])
 
@@ -67,7 +67,7 @@ class MobileWall2(MobileWall1):
     def __init__(self, xy):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((30, 100))
-        self.image.fill('red')
+        self.image.fill('gray')
         self.rect = self.image.get_rect()
         self.rect.center = (xy[0], xy[1])
 
