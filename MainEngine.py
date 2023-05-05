@@ -1,5 +1,6 @@
 # All imports will be there
 import UserAndMapData
+import CarRender
 import pygame
 import time
 import os
@@ -10,6 +11,7 @@ if session_data[0] == 'creative':
     import CarPowerCreativeMode as CarPower
 else:
     import CarPowerPlayMode as CarPower
+    import NoCollideBlocks
 
 
 def load_image(name):  # Load all img
@@ -38,22 +40,26 @@ pygame.init()
 pygame.display.set_caption('Cold Road')
 
 # All constants will be there
-main_run = True
 screen_width = pygame.display.Info().current_w
 screen_height = pygame.display.Info().current_h
 screen = pygame.display.set_mode((screen_width, screen_height))
 clock = pygame.time.Clock()
 time_start = time.time() - 0.0167
-background = pygame.transform.scale(load_image(session_data[-1]), (screen_width, screen_height))
-car0 = pygame.transform.scale(load_image(session_data[1]), (screen_width // 9.6, screen_height // 10.8))
-print(db.get_car(session_data[1]))
+background = pygame.transform.scale(load_image('GameFiles/' + session_data[-1]), (screen_width, screen_height))
+car0 = pygame.transform.scale(load_image('GameFiles/' + session_data[1]), (180, 100))
+now_car = (car0, (screen_width // 2 - 90, screen_height // 2 - 50))
 car_data = db.get_car(session_data[1])[0]  # (car, power, clutch, streamlining, max_sp, price, str)
 bg_data = db.get_background(session_data[-1])[0]  # (name, clutch, price, str)
+fps_in_game = pygame.font.Font(pygame.font.get_default_font(), 36)
+all_sprites = pygame.sprite.Group()
+now_block = '.'
+main_run = True
 power_width_high = False
 power_width_low = False
 power_height_high = False
 power_height_low = False
 esc_button = False
+car_stop = False
 last_power_height = 0
 last_power_width = 0
 coordinates_changed = [0, 0]
@@ -78,6 +84,8 @@ while main_run:
                 power_width_high = True
             if event.key == pygame.K_ESCAPE:
                 esc_button = not esc_button
+            if event.key == pygame.K_SPACE:
+                car_stop = True
 
         elif event.type == pygame.KEYUP:
             if event.key == pygame.K_w:
@@ -88,29 +96,35 @@ while main_run:
                 power_width_low = False
             if event.key == pygame.K_d:
                 power_width_high = False
+            if event.key == pygame.K_SPACE:
+                car_stop = False
 
+    # All time-dependent physic
     time_end = time.time()
     if session_data[0] == 'creative':
         last_power_width, last_power_height = CarPower.calculate_engine(power_width_high, power_width_low,
                                                                         power_height_high, power_height_low,
                                                                         esc_button, last_power_width, last_power_height)
-        print(last_power_height, last_power_width)
     else:
         last_power_width, last_power_height = CarPower.calculate_engine(power_width_high, power_width_low,
                                                                         power_height_high, power_height_low, time_end,
                                                                         time_start, esc_button, last_power_width,
                                                                         last_power_height, car_data,
-                                                                        bg_data)  # Getting powers
+                                                                        bg_data, car_stop)  # Getting powers
+    last_power_width *= 1 / ((1 / 60) / (time_end - time_start))
+    last_power_height *= 1 / ((1 / 60) / (time_end - time_start))
+    time_start = time.time()
+    # End all operations with time
+
+    # Work with sprites start
 
     # THIS is global state of changing coordinates!
-    coordinates_changed = [coordinates_changed[0] - (1 / ((1 / 60) / (time_end - time_start))) * last_power_width,
-                           coordinates_changed[1] - (1 / ((1 / 60) / (time_end - time_start))) * last_power_height]
-    print(1 / (time_end - time_start))  # alpha-data: FPS
-    time_start = time.time()
-
+    coordinates_changed = [coordinates_changed[0] - last_power_width, coordinates_changed[1] - last_power_height]
+    # RENDER AT THE END!
     # Starting render there
     change_bg()
-
-    screen.blit(car0, (screen_width / 2, screen_height / 2))
-
+    now_car = CarRender.render_car(power_width_high, power_width_low, power_height_high, power_height_low, car0,
+                                   (screen_width, screen_height), now_car)
+    screen.blit(now_car[0], now_car[1])
+    screen.blit(fps_in_game.render(f'FPS: {str(clock.get_fps())[:4]}', True, 'white'), dest=(10, 10))
     pygame.display.flip()

@@ -1,9 +1,8 @@
 import pygame
 
 
-class Wall1(pygame.sprite.Sprite):
+class Wall1:
     def __init__(self, xy):
-        pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((100, 30))
         self.image.fill('cyan')
         self.rect = self.image.get_rect()
@@ -12,7 +11,7 @@ class Wall1(pygame.sprite.Sprite):
 
 class Wall2(Wall1):
     def __init__(self, xy):
-        pygame.sprite.Sprite.__init__(self)
+        Wall1.__init__(self, xy)
         self.image = pygame.Surface((30, 100))
         self.image.fill('cyan')
         self.rect = self.image.get_rect()
@@ -84,7 +83,8 @@ class FinishFlor1(pygame.sprite.Sprite):
 class FinishFlor2(pygame.sprite.Sprite):
     def __init__(self, xy):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.transform.rotate(pygame.transform.scale(pygame.image.load('Finish_line.png'), (100, 40)), 90)
+        self.image = pygame.transform.rotate(pygame.transform.scale(pygame.image.load('Finish_line.png'),
+                                                                    (100, 40)), 90)
         self.rect = self.image.get_rect()
         self.rect.center = (xy[0], xy[1])
 
@@ -96,3 +96,7 @@ class Money(pygame.sprite.Sprite):
         self.image.fill('yellow')
         self.rect = self.image.get_rect()
         self.rect.center = (xy[0], xy[1])
+
+
+def update_sprites():
+    pass
