@@ -3,10 +3,19 @@ import pygame
 
 class Wall1:
     def __init__(self, xy):
+        pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((100, 30))
         self.image.fill('cyan')
         self.rect = self.image.get_rect()
         self.rect.center = (xy[0], xy[1])
+
+    def update(self, xy, delete = False):
+        if delete:
+            collision = self.rect.collidepoint(xy[0], xy[1])
+            if collision:
+                self.kill()
+
+        self.rect.center = (self.rect.center[0] - xy[0], self.rect.center[1] - xy[1])
 
 
 class Wall2(Wall1):
@@ -98,5 +107,13 @@ class Money(pygame.sprite.Sprite):
         self.rect.center = (xy[0], xy[1])
 
 
+def create_sprite(coordinates, type):
+    pass
+
+
 def update_sprites():
+    pass
+
+
+def draw_strites():
     pass

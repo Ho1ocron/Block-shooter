@@ -136,4 +136,3 @@ while main_run:
                                                  mouse_pos[1] - (mouse_pos[1] + last_power_height) % 5))
     screen.blit(fps_in_game.render(f'FPS: {str(clock.get_fps())[:4]}', True, 'white'), dest=(10, 10))
     pygame.display.flip()
-0
