@@ -29,7 +29,7 @@ class User:
                             Structure STR);""")
         if not self.cursor.execute("SELECT * FROM cars").fetchall():
             self.cursor.execute("INSERT INTO cars('Car', 'Power', 'Clutch', 'Streamlining', 'Max_Speed', 'Price',"
-                                "'Structure') VALUES(?, ?, ?, ?, ?, ?, ?)", ('Lada Kalina', 1.0, 1.0, 1.0, 7.0, 0,
+                                "'Structure') VALUES(?, ?, ?, ?, ?, ?, ?)", ('Lada Kalina', 1.0, 1.0, 4.0, 40.0, 0,
                                                                              'car1.png'))
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS backgrounds(
                             Background STR,
@@ -45,7 +45,9 @@ class User:
                             Level STR,
                             Background STR);""")
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS maps(
-                            map STR);""")
+                            map STR, type STR, price INT);""")
+        if not self.cursor.execute("SELECT * FROM maps").fetchall():
+            self.create_map('1')
 
     def get_car(self, name):
         with self.connection:
@@ -73,7 +75,34 @@ class User:
             return self.cursor.execute("SELECT * FROM session").fetchall()
 
     def create_map(self, name):
-        self.cursor.execute(F"""CREATE TABLE IF NOT EXISTS {name}map(
-                            id INT, type INT, width BIGINT, height BIGINT);""")
         with self.connection:
-            return self.cursor.execute("INSERT INTO maps(map) VALUES(?)", name)
+            self.cursor.execute(F"""CREATE TABLE IF NOT EXISTS m{name}map(
+                                id INT, type INT, width BIGINT, height BIGINT);""")
+            return self.cursor.execute("INSERT INTO maps('map', 'type', 'price') VALUES(?, ?, ?)", ('1', 'official', 0)
+                                       )
+
+    def get_all_maps(self):
+        with self.connection:
+            return self.cursor.execute("SELECT * FROM maps").fetchall()
+
+    def load_map_data(self, name):
+        with self.connection:
+            return self.cursor.execute(f"SELECT * from m{name}map").fetchall()
+
+    def save_map_data(self, name, data):
+        with self.connection:
+            self.cursor.execute(f"DROP TABLE m{name}map")
+            self.create_map(name)
+            counter = 0
+            for i in data:
+                counter += 1
+                self.cursor.execute(f"INSERT INTO m{name}map(id, type, width, height) VALUES(?, ?, ?, ?)", (counter,
+                                                                                                            *i))
+
+    def delete_map(self, id):
+        with self.connection:
+            self.cursor.execute(f"DELETE FROM maps WHERE map = '{id}'")
+            self.cursor.execute(f"DROP TABLE m{id}map")
+            if not self.cursor.execute("SELECT * FROM maps").fetchall():
+                self.create_map('01')
+                return

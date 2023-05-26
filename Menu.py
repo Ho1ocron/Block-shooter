@@ -24,7 +24,7 @@ class App(QWidget):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
         self.palette = QPalette()
-        self.palette.setBrush(QPalette.Background, QBrush(QPixmap("GameFiles\CR1.0.png")))
+        self.palette.setBrush(QPalette.Background, QBrush(QPixmap("back.png")))
         self.setPalette(self.palette)
 
         #: start button

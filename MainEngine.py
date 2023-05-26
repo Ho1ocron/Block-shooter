@@ -5,12 +5,12 @@ import pygame
 import time
 import os
 import sys
+import NoCollideBlocks
 db = UserAndMapData.User()
 session_data = db.get_session()[-1]  # (gm, car, level, bg)
 if session_data[0] == 'creative':
     import CarPowerCreativeMode as CarPower
     import CreativePer
-    import NoCollideBlocks
     import PreRenderBlocks
 else:
     import CarPowerPlayMode as CarPower
@@ -62,18 +62,25 @@ power_height_high = False
 power_height_low = False
 esc_button = False
 car_stop = False
+place_block = False
+delete_block = False
+shift = False
 last_power_height = 0
 last_power_width = 0
 coordinates_changed = [0, 0]
 
 
 # Main cycle start
+
+NoCollideBlocks.load_map(db.load_map_data(session_data[2]))
 while main_run:
     clock.tick(60)
     mouse_pos = pygame.mouse.get_pos()
     # All events will be there
     for event in pygame.event.get():
         if event.type == pygame.QUIT:  # Close program
+            map_save = NoCollideBlocks.save_map()
+            db.save_map_data(session_data[2], map_save)
             main_run = False
 
         elif event.type == pygame.KEYDOWN:  # Checking control keys
@@ -89,9 +96,16 @@ while main_run:
                 esc_button = not esc_button
             if event.key == pygame.K_SPACE:
                 car_stop = True
+            if event.key == pygame.K_LSHIFT:
+                shift = True
             if session_data[0] == 'creative':
                 if CreativePer.type_block(event) is not None:
                     now_block = CreativePer.type_block(event)
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                place_block = True
+            elif event.button == 3:
+                delete_block = True
 
         elif event.type == pygame.KEYUP:
             if event.key == pygame.K_w:
@@ -104,35 +118,47 @@ while main_run:
                 power_width_high = False
             if event.key == pygame.K_SPACE:
                 car_stop = False
+            if event.key == pygame.K_LSHIFT:
+                shift = False
 
     # All time-dependent physic
     time_end = time.time()
     if session_data[0] == 'creative':
         last_power_width, last_power_height = CarPower.calculate_engine(power_width_high, power_width_low,
                                                                         power_height_high, power_height_low,
-                                                                        esc_button, last_power_width, last_power_height)
+                                                                        esc_button, last_power_width, last_power_height,
+                                                                        shift)
     else:
         last_power_width, last_power_height = CarPower.calculate_engine(power_width_high, power_width_low,
                                                                         power_height_high, power_height_low, time_end,
                                                                         time_start, esc_button, last_power_width,
                                                                         last_power_height, car_data,
                                                                         bg_data, car_stop)  # Getting powers
-    last_power_width *= 1 / ((1 / 60) / (time_end - time_start))
-    last_power_height *= 1 / ((1 / 60) / (time_end - time_start))
+
     time_start = time.time()
     # End all operations with time
 
     # Work with sprites start
     # THIS is global state of changing coordinates!
-    coordinates_changed = [coordinates_changed[0] - last_power_width, coordinates_changed[1] - last_power_height]
-    # RENDER AT THE END!
+    coordinates_changed = [coordinates_changed[0] - int(last_power_width), coordinates_changed[1] -
+                           int(last_power_height)]
+
+
     # Starting render there
     change_bg()
     now_car = CarRender.render_car(power_width_high, power_width_low, power_height_high, power_height_low, car0,
                                    (screen_width, screen_height), now_car)
     screen.blit(now_car[0], now_car[1])
     if session_data[0] == 'creative':
-        PreRenderBlocks.draw(screen, now_block, (mouse_pos[0] - (mouse_pos[0] + last_power_width) % 5,
-                                                 mouse_pos[1] - (mouse_pos[1] + last_power_height) % 5))
+        PreRenderBlocks.draw(screen, now_block, (mouse_pos[0] - (mouse_pos[0] + int(last_power_width)) % 5,
+                                                 mouse_pos[1] - (mouse_pos[1] + int(last_power_height)) % 5))
+        if place_block:
+            place_block = False
+            NoCollideBlocks.create_sprite(mouse_pos, now_block)
+        if delete_block:
+            delete_block = False
+            NoCollideBlocks.delete_sprites(mouse_pos)
+    NoCollideBlocks.update_sprites((int(last_power_width), int(last_power_height)))
+    NoCollideBlocks.draw_sprites(screen)
     screen.blit(fps_in_game.render(f'FPS: {str(clock.get_fps())[:4]}', True, 'white'), dest=(10, 10))
     pygame.display.flip()
