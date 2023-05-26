@@ -39,3 +39,7 @@ class FinishFlor1(NoCollideBlocks.FinishFlor1):
 
 class FinishFlor2(NoCollideBlocks.FinishFlor2):
     pass
+
+
+class Money(NoCollideBlocks.Money):
+    pass
